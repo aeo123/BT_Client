@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.bt.aeo.bt_client.MainActivity">
+    android:fitsSystemWindows="false"
+    tools:context="com.bt.aeo.bt_client.ReadActivityActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -22,6 +22,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <include layout="@layout/content_read" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -3,8 +3,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.bt.aeo.bt_client.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_clear"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/action_clear"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_read"
+        android:orderInCategory="100"
+        android:title="@string/action_read"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_connect"
+        android:orderInCategory="100"
+        android:title="@string/action_connect"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_more"
+        android:orderInCategory="100"
+        android:title="@string/action_more"
         app:showAsAction="never" />
 </menu>

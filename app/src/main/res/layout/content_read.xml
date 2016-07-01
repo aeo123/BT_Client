@@ -9,8 +9,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.bt.aeo.bt_client.MainActivity"
-    tools:showIn="@layout/activity_main">
+    tools:context="com.bt.aeo.bt_client.ReadActivityActivity"
+    tools:showIn="@layout/activity_read">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -22,20 +22,23 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:text="@string/str_num"
-            android:id="@+id/textView"
+            android:text="时间:"
+            android:id="@+id/text_time"
             android:layout_weight="1"
             android:textSize="18sp"
             android:gravity="center_vertical|center_horizontal" />
 
         <EditText
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:id="@+id/input_num"
-            android:layout_weight="5"
-            android:textSize="18sp"
-            android:gravity="center_vertical"
-            android:hint="请输入编号" />
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            android:ems="10"
+            android:id="@+id/input_time"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:editable="true"
+            android:hint="请选择日期" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -50,26 +53,26 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:text="@string/str_rule"
-            android:id="@+id/textView2"
+            android:id="@+id/text_l"
             android:layout_weight="1"
             android:textSize="18sp"
             android:gravity="center_vertical|center_horizontal" />
 
         <EditText
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:id="@+id/input_rule"
-            android:layout_weight="5"
-            android:textSize="18sp"
-            android:gravity="center_vertical"
-            android:hint="请输入规则" />
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            android:ems="10"
+            android:id="@+id/input_l"
+            android:layout_weight="1" />
+
     </LinearLayout>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/str_bt_config"
-        android:id="@+id/bt_config"
+        android:text="@string/str_bt_read"
+        android:id="@+id/bt_read"
         android:layout_below="@+id/linearLayout2"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp" />
