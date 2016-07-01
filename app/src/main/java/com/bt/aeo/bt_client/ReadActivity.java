@@ -42,7 +42,7 @@ public class ReadActivity extends AppCompatActivity {
     EditText EDT_time;
     EditText EDT_path;
     static String PATH;                                //完整路径
-    String FILENAME="SaveData.txt";         //文件名
+    String FILENAME="SaveData.csv";         //文件名
     String DIR="BT_Recieve";                //文件夹名，也可以不要文件夹
     String month;
     String day;
@@ -223,7 +223,7 @@ public class ReadActivity extends AppCompatActivity {
             PrintStream out = null; // 打印流对象用于输出
             try {
                 out = new PrintStream(new FileOutputStream(file, true)); // 追加文件
-                out.print(content);
+                out.println(content);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

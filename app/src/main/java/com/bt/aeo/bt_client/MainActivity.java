@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     EditText EDT_num;
     EditText EDT_rule;
     Toolbar toolbar;
-
+    String  StrBuff="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -198,8 +198,12 @@ public class MainActivity extends AppCompatActivity {
                 case MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-
-                    ReadActivity.writeFile(readMessage);
+                    StrBuff+=readMessage;
+                    if(StrBuff.indexOf("end")>-1) {
+                        ReadActivity.writeFile(StrBuff.substring(0, StrBuff.indexOf("end")));
+                        StrBuff="";
+                       // StrBuff=StrBuff.substring(StrBuff.indexOf("end")+5);
+                    }
                     Toast.makeText(MainActivity.this, R.string.str_read_success, Toast.LENGTH_SHORT).show();
                     break;
                 case MESSAGE_DEVICE_NAME:
