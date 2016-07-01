@@ -35,7 +35,8 @@
             android:layout_weight="5"
             android:textSize="18sp"
             android:gravity="center_vertical"
-            android:hint="请输入编号" />
+            android:hint="请输入编号"
+            android:singleLine="true" />
     </LinearLayout>
 
     <LinearLayout
@@ -62,7 +63,8 @@
             android:layout_weight="5"
             android:textSize="18sp"
             android:gravity="center_vertical"
-            android:hint="请输入规则" />
+            android:hint="请输入规则"
+            android:singleLine="true" />
     </LinearLayout>
 
     <Button
@@ -72,6 +74,7 @@
         android:id="@+id/bt_config"
         android:layout_below="@+id/linearLayout2"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp" />
+        android:layout_marginTop="40dp"
+        android:textSize="30dp" />
 
 </RelativeLayout>

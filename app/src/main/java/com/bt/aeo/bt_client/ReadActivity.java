@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
@@ -23,9 +24,13 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.Calendar;
-
+import java.util.Scanner;
 /**
  * Created by aeo on 2016/6/30.
  */
@@ -35,7 +40,13 @@ public class ReadActivity extends AppCompatActivity {
     private static final boolean D = true;
 
     EditText EDT_time;
-
+    EditText EDT_path;
+    static String PATH;                                //完整路径
+    String FILENAME="SaveData.txt";         //文件名
+    String DIR="BT_Recieve";                //文件夹名，也可以不要文件夹
+    String month;
+    String day;
+    String myear;
 
     private DatePickerDialog.OnDateSetListener DatePickerListener = new DatePickerDialog.OnDateSetListener() {
         @Override
@@ -43,9 +54,10 @@ public class ReadActivity extends AppCompatActivity {
                               int dayOfMonth) {
             // TODO Auto-generated method stub
             DecimalFormat df=new DecimalFormat("00");
-            String month=df.format((monthOfYear+1));
-            String day=df.format(dayOfMonth);
-            EDT_time.setText(new StringBuilder().append("").append(year).append("-").append(month).append("-").append(day).append(""));
+            myear= Integer.toString(year);
+            month=df.format((monthOfYear+1));
+            day=df.format(dayOfMonth);
+            EDT_time.setText(new StringBuilder().append("").append(myear).append("-").append(month).append("-").append(day).append(""));
         }
     };
     @Override
@@ -92,22 +104,42 @@ public class ReadActivity extends AppCompatActivity {
             }
         });
 
+        EDT_path = (EditText) findViewById(R.id.input_path);
+        PATH=getSDPath()+ File.separator+ DIR + File.separator + FILENAME;
+        EDT_path.setText(PATH);
 
-//        Button Bt_read = (Button) findViewById(R.id.bt_config);
-//        EDT_num = (EditText) findViewById(R.id.input_num);
-//        EDT_rule = (EditText) findViewById(R.id.input_rule);
-//        Bt_config.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                //发送数据
-//                String senddata="Rule:"+EDT_num.getText()+"Name:"+EDT_rule.getText()+',';
-//
-//                sendMessage(senddata);
-//            }
-//        });
+
+        Button Bt_read = (Button) findViewById(R.id.bt_read);
+        Bt_read.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //发送数据，更新输入的路径
+                PATH=EDT_path.getText().toString();
+                String senddata="GetResult:"+myear+month+day+".TXT";
+                sendMessage(senddata);
+            }
+        });
 
 
     }
+    private void sendMessage(String message) {
+
+        //按下设置未连接蓝牙发出提醒
+        if (MainActivity.mBTService.getState() != BluetoothService.STATE_CONNECTED) {
+            Toast.makeText(ReadActivity.this, R.string.str_not_connected, Toast.LENGTH_SHORT).show();
+        }else {
+            //发送数据到蓝牙
+            //没输入提示警告
+            if(EDT_time.getText().length()==0  || EDT_path.getText().length()==0)
+                Toast.makeText(ReadActivity.this, R.string.str_input_waring, Toast.LENGTH_SHORT).show();
+            else{
+                byte[] send = message.getBytes();
+                MainActivity.mBTService.write(send);
+            }
+        }
+
+    }
+
 
     @Override
     public void onStart() {
@@ -163,6 +195,79 @@ public class ReadActivity extends AppCompatActivity {
             return true;
         }
         return false;
+    }
+
+    public String getSDPath(){
+        File sdDir = null;
+        boolean sdCardExist = Environment.getExternalStorageState()
+                .equals(android.os.Environment.MEDIA_MOUNTED);//判断sd卡是否存在
+        if(sdCardExist)
+        {
+            sdDir = Environment.getExternalStorageDirectory();//获取跟目录
+        }else { // SDCard不存在，使用Toast提示用户
+            Toast.makeText(this, "打开路径失败，SD卡不存在！", Toast.LENGTH_LONG).show();
+        }
+        return sdDir.toString();
+    }
+
+    // 文件写操作函数
+        public static void writeFile(String content) {
+
+        if (Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) { // 如果sdcard存在
+            File file = new File(PATH); // 定义File类对象
+
+            if (!file.getParentFile().exists()) { // 父文件夹不存在
+                file.getParentFile().mkdirs(); // 创建文件夹
+            }
+            PrintStream out = null; // 打印流对象用于输出
+            try {
+                out = new PrintStream(new FileOutputStream(file, true)); // 追加文件
+                out.print(content);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (out != null) {
+                    out.close(); // 关闭打印流
+                }
+            }
+        }
+    }
+
+
+    // 文件读操作函数
+    private String read() {
+
+        if (Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) { // 如果sdcard存在
+            File file = new File(Environment.getExternalStorageDirectory()
+                    .toString()
+                    + File.separator
+                    + DIR
+                    + File.separator
+                    + FILENAME); // 定义File类对象
+            if (!file.getParentFile().exists()) { // 父文件夹不存在
+                file.getParentFile().mkdirs(); // 创建文件夹
+            }
+            Scanner scan = null; // 扫描输入
+            StringBuilder sb = new StringBuilder();
+            try {
+                scan = new Scanner(new FileInputStream(file)); // 实例化Scanner
+                while (scan.hasNext()) {            // 循环读取
+                    sb.append(scan.next() + "\n"); // 设置文本
+                }
+                return sb.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (scan != null) {
+                    scan.close(); // 关闭打印流
+                }
+            }
+        } else { // SDCard不存在，使用Toast提示用户
+            Toast.makeText(this, "读取失败，SD卡不存在！", Toast.LENGTH_LONG).show();
+        }
+        return null;
     }
 
 

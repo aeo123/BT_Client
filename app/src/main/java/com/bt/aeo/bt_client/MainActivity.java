@@ -1,5 +1,6 @@
 package com.bt.aeo.bt_client;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     EditText EDT_num;
     EditText EDT_rule;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +55,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // App Logo
+        toolbar.setLogo(R.mipmap.ic_launcher);
+
         setSupportActionBar(toolbar);
 
         // 获得蓝牙适配器
@@ -71,8 +76,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //发送数据
-                String senddata="Rule:"+EDT_num.getText()+"Name:"+EDT_rule.getText()+',';
-
+                String senddata = "Rule:" + EDT_num.getText() + "Name:" + EDT_rule.getText() + ',';
                 sendMessage(senddata);
             }
         });
@@ -84,12 +88,12 @@ public class MainActivity extends AppCompatActivity {
         //按下设置未连接蓝牙发出提醒
         if (MainActivity.mBTService.getState() != BluetoothService.STATE_CONNECTED) {
             Toast.makeText(MainActivity.this, R.string.str_not_connected, Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
             //发送数据到蓝牙
             //没输入提示警告
-            if(message.length()==0 )
+            if (EDT_num.getText().length() == 0 || EDT_rule.getText().length() == 0)
                 Toast.makeText(MainActivity.this, R.string.str_input_waring, Toast.LENGTH_SHORT).show();
-            else{
+            else {
                 byte[] send = message.getBytes();
                 MainActivity.mBTService.write(send);
             }
@@ -130,6 +134,12 @@ public class MainActivity extends AppCompatActivity {
         } else
             mBTService = new BluetoothService(this, mHandler);
 
+
+        // Sub Title
+        if (MainActivity.mBTService.getState() == BluetoothService.STATE_CONNECTED) {
+            setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
+        }else
+            setStatus(R.string.title_not_connected);
     }
 
     @Override
@@ -153,6 +163,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private final void setStatus(int resId) {
+        toolbar.setSubtitle(resId);
+
+    }
+
+    private final void setStatus(CharSequence subTitle) {
+        toolbar.setSubtitle(subTitle);
+    }
 
     // 主线程 Handler ，处理来自蓝牙socket线程的消息
     private Handler mHandler = new Handler() {
@@ -162,16 +180,27 @@ public class MainActivity extends AppCompatActivity {
                 case MESSAGE_STATE_CHANGE:
                     if (D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
                     switch (msg.arg1) {
-
+                        case BluetoothService.STATE_CONNECTED:
+                            setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
+                            break;
+                        case BluetoothService.STATE_CONNECTING:
+                            setStatus(R.string.title_connecting);
+                            break;
+                        case BluetoothService.STATE_LISTEN:
+                        case BluetoothService.STATE_NONE:
+                            setStatus(R.string.title_not_connected);
+                            break;
                     }
                     break;
                 case MESSAGE_WRITE:
-
+                    Toast.makeText(MainActivity.this,  R.string.str_send_success, Toast.LENGTH_SHORT).show();
                     break;
                 case MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    Toast.makeText(MainActivity.this, R.string.str_send_success, Toast.LENGTH_SHORT).show();
+
+                    ReadActivity.writeFile(readMessage);
+                    Toast.makeText(MainActivity.this, R.string.str_read_success, Toast.LENGTH_SHORT).show();
                     break;
                 case MESSAGE_DEVICE_NAME:
                     // save the connected device's name
@@ -186,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -219,11 +248,19 @@ public class MainActivity extends AppCompatActivity {
                 serverIntent = new Intent(this, DeviceListActivity.class);
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
                 return true;
+            case R.id.action_disconnect:
+                //断开蓝牙
+                if (MainActivity.mBTService.getState() != BluetoothService.STATE_CONNECTED) {
+                    Toast.makeText(MainActivity.this, R.string.str_not_connected, Toast.LENGTH_SHORT).show();
+                } else {
+                    if (mBTService != null) mBTService.stop();
+                }
+                return true;
             case R.id.action_more:
                 //预留
                 return true;
             default:
-                    break;
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

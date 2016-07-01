@@ -472,33 +472,20 @@ public class BluetoothService {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int bytes;
-            long startTime=0;
-            long endTime=0;
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
                     int a;
                     // Read from the InputStream
-                    if (dataProcess == false) {
-                        dataProcess = true;
+
                         bytes = mmInStream.read(buffer);
                         Message msg= new Message();
                         msg.obj=buffer;
                         msg.arg1=bytes;
                         msg.what = MainActivity.MESSAGE_READ;
-                        //dataHandler.sendMessage(msg);
-//                        dataHandler.obtainMessage(MainActivity.MESSAGE_READ, bytes, -1, buffer)
-//                                .sendToTarget();
-                        startTime = System.currentTimeMillis();
-                    }
-                    endTime = System.currentTimeMillis();
-                    int diffTime  = (int)(endTime - startTime);
-                    if(diffTime>2000)   //大于2s
-                        dataProcess = false;
-//                   try{
-//                        Thread.sleep(20);//有异常需要捕获
-//                    }catch(Exception e){
-//                   }
+                        mHandler.sendMessage(msg);
+
+
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();

@@ -34,7 +34,7 @@
             android:inputType="date"
             android:ems="10"
             android:id="@+id/input_time"
-            android:layout_weight="1"
+            android:layout_weight="6"
             android:clickable="true"
             android:editable="true"
             android:hint="请选择日期" />
@@ -52,8 +52,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:text="@string/str_rule"
-            android:id="@+id/text_l"
+            android:text="@string/str_path"
+            android:id="@+id/text_path"
             android:layout_weight="1"
             android:textSize="18sp"
             android:gravity="center_vertical|center_horizontal" />
@@ -61,10 +61,13 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="date"
+            android:inputType="textMultiLine"
             android:ems="10"
-            android:id="@+id/input_l"
-            android:layout_weight="1" />
+            android:id="@+id/input_path"
+            android:layout_below="@+id/linearLayout"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_weight="6" />
 
     </LinearLayout>
 
@@ -75,6 +78,7 @@
         android:id="@+id/bt_read"
         android:layout_below="@+id/linearLayout2"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp" />
+        android:layout_marginTop="40dp"
+        android:textSize="25dp" />
 
 </RelativeLayout>
