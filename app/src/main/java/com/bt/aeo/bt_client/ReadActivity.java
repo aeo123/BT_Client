@@ -93,7 +93,18 @@ public class ReadActivity extends AppCompatActivity {
         });
 
 
-
+//        Button Bt_read = (Button) findViewById(R.id.bt_config);
+//        EDT_num = (EditText) findViewById(R.id.input_num);
+//        EDT_rule = (EditText) findViewById(R.id.input_rule);
+//        Bt_config.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                //发送数据
+//                String senddata="Rule:"+EDT_num.getText()+"Name:"+EDT_rule.getText()+',';
+//
+//                sendMessage(senddata);
+//            }
+//        });
 
 
     }
