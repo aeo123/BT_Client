@@ -31,19 +31,19 @@ import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Scanner;
+
 /**
  * Created by aeo on 2016/6/30.
  */
-public class ReadActivity extends AppCompatActivity {
+public class ReadActivity extends  AppCompatActivity{
     // Debugging
     private static final String TAG = "READActivity";
-    private static final boolean D = true;
-
-    EditText EDT_time;
+    private static final boolean D = true;  EditText EDT_time;
     EditText EDT_path;
     static String PATH;                                //完整路径
-    String FILENAME="SaveData.csv";         //文件名
-    String DIR="BT_Recieve";                //文件夹名，也可以不要文件夹
+    String FILENAME = "SaveData";         //文件名
+    String FILEEND = ".csv";                  //文件后缀
+    String DIR = "BT_Recieve";                //文件夹名，也可以不要文件夹
     String month;
     String day;
     String myear;
@@ -53,13 +53,17 @@ public class ReadActivity extends AppCompatActivity {
         public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
             // TODO Auto-generated method stub
-            DecimalFormat df=new DecimalFormat("00");
-            myear= Integer.toString(year);
-            month=df.format((monthOfYear+1));
-            day=df.format(dayOfMonth);
+            DecimalFormat df = new DecimalFormat("00");
+            myear = Integer.toString(year);
+            month = df.format((monthOfYear + 1));
+            day = df.format(dayOfMonth);
             EDT_time.setText(new StringBuilder().append("").append(myear).append("-").append(month).append("-").append(day).append(""));
+            FILENAME = EDT_time.getText().toString();
+            PATH = getSDPath() + File.separator + DIR + File.separator + FILENAME + FILEEND;
+            EDT_path.setText(PATH);
         }
     };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,9 +93,7 @@ public class ReadActivity extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                FILENAME=EDT_time.getText().toString();
-                                PATH=getSDPath()+ File.separator+ DIR + File.separator + FILENAME;
-                                EDT_path.setText(PATH);
+
 
                             }
                         });
@@ -108,32 +110,31 @@ public class ReadActivity extends AppCompatActivity {
         });
 
 
-
-
         Button Bt_read = (Button) findViewById(R.id.bt_read);
         Bt_read.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //发送数据，更新输入的路径
-                PATH=EDT_path.getText().toString();
-                String senddata="GetResult:"+myear+month+day+".TXT";
+                PATH = EDT_path.getText().toString();
+                String senddata = "GetResult:" + myear + month + day + ".TXT";
                 sendMessage(senddata);
             }
         });
 
 
     }
+
     private void sendMessage(String message) {
 
         //按下设置未连接蓝牙发出提醒
         if (MainActivity.mBTService.getState() != BluetoothService.STATE_CONNECTED) {
             Toast.makeText(ReadActivity.this, R.string.str_not_connected, Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
             //发送数据到蓝牙
             //没输入提示警告
-            if(EDT_time.getText().length()==0  || EDT_path.getText().length()==0)
+            if (EDT_time.getText().length() == 0 || EDT_path.getText().length() == 0)
                 Toast.makeText(ReadActivity.this, R.string.str_input_waring, Toast.LENGTH_SHORT).show();
-            else{
+            else {
                 byte[] send = message.getBytes();
                 MainActivity.mBTService.write(send);
             }
@@ -198,21 +199,20 @@ public class ReadActivity extends AppCompatActivity {
         return false;
     }
 
-    public String getSDPath(){
+    public String getSDPath() {
         File sdDir = null;
         boolean sdCardExist = Environment.getExternalStorageState()
                 .equals(android.os.Environment.MEDIA_MOUNTED);//判断sd卡是否存在
-        if(sdCardExist)
-        {
+        if (sdCardExist) {
             sdDir = Environment.getExternalStorageDirectory();//获取跟目录
-        }else { // SDCard不存在，使用Toast提示用户
+        } else { // SDCard不存在，使用Toast提示用户
             Toast.makeText(this, "打开路径失败，SD卡不存在！", Toast.LENGTH_LONG).show();
         }
         return sdDir.toString();
     }
 
     // 文件写操作函数
-        public static void writeFile(String content) {
+    public static void writeFile(String content, boolean append) {
 
         if (Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) { // 如果sdcard存在
@@ -223,8 +223,9 @@ public class ReadActivity extends AppCompatActivity {
             }
             PrintStream out = null; // 打印流对象用于输出
             try {
-                out = new PrintStream(new FileOutputStream(file, true)); // 追加文件
-                out.print(content);
+                out = new PrintStream(new FileOutputStream(file, append)); // 追加文件
+                if (!content.equals("")) //空的就不输出了
+                    out.println(content);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

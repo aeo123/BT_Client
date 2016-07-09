@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     EditText EDT_rule;
     Toolbar toolbar;
     String  StrBuff="";
+    byte[] byteBuff;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -197,15 +198,23 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
+
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     StrBuff+=readMessage;
-                    if(StrBuff.indexOf("end")>-1) {
-                        ReadActivity.writeFile(StrBuff.substring(0, StrBuff.indexOf("end")));
-                        //StrBuff="";
-                        StrBuff=StrBuff.substring(StrBuff.indexOf("end")+5);
+
+                    while(StrBuff.indexOf("end")>-1 ) {
+                        String dataBuff=StrBuff.substring(0, StrBuff.indexOf("end"));
+                            ReadActivity.writeFile("",false);                                           //清空
+                        while(dataBuff.indexOf("|")>-1) {
+                            ReadActivity.writeFile(dataBuff.substring(0, dataBuff.indexOf("|")),true);  //追加
+                            dataBuff=dataBuff.substring(dataBuff.indexOf("|")+3);
+                        }
+                        StrBuff=StrBuff.substring(StrBuff.indexOf("end")+4);
+                        byteBuff=StrBuff.getBytes();
                     }
+                    mBTService.setDataProcess(false);
                     Toast.makeText(MainActivity.this, R.string.str_read_success, Toast.LENGTH_SHORT).show();
-                    break;
+                break;
                 case MESSAGE_DEVICE_NAME:
                     // save the connected device's name
                     mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
