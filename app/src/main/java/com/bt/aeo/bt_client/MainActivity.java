@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //发送数据
-                String senddata = "Rule:" + EDT_num.getText() + "Name:" + EDT_rule.getText() + ',';
+                String senddata = "Rule:" + EDT_rule.getText() + "Name:" + EDT_num.getText() + ',';
                 sendMessage(senddata);
             }
         });
@@ -201,8 +201,8 @@ public class MainActivity extends AppCompatActivity {
                     StrBuff+=readMessage;
                     if(StrBuff.indexOf("end")>-1) {
                         ReadActivity.writeFile(StrBuff.substring(0, StrBuff.indexOf("end")));
-                        StrBuff="";
-                       // StrBuff=StrBuff.substring(StrBuff.indexOf("end")+5);
+                        //StrBuff="";
+                        StrBuff=StrBuff.substring(StrBuff.indexOf("end")+5);
                     }
                     Toast.makeText(MainActivity.this, R.string.str_read_success, Toast.LENGTH_SHORT).show();
                     break;

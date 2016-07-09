@@ -70,6 +70,7 @@ public class ReadActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        EDT_path = (EditText) findViewById(R.id.input_path);
         EDT_time = (EditText) findViewById(R.id.input_time);
         EDT_time.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,7 +89,9 @@ public class ReadActivity extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
+                                FILENAME=EDT_time.getText().toString();
+                                PATH=getSDPath()+ File.separator+ DIR + File.separator + FILENAME;
+                                EDT_path.setText(PATH);
 
                             }
                         });
@@ -104,9 +107,7 @@ public class ReadActivity extends AppCompatActivity {
             }
         });
 
-        EDT_path = (EditText) findViewById(R.id.input_path);
-        PATH=getSDPath()+ File.separator+ DIR + File.separator + FILENAME;
-        EDT_path.setText(PATH);
+
 
 
         Button Bt_read = (Button) findViewById(R.id.bt_read);
@@ -223,7 +224,7 @@ public class ReadActivity extends AppCompatActivity {
             PrintStream out = null; // 打印流对象用于输出
             try {
                 out = new PrintStream(new FileOutputStream(file, true)); // 追加文件
-                out.println(content);
+                out.print(content);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
