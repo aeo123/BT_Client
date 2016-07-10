@@ -2,14 +2,19 @@ package com.bt.aeo.bt_client;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -29,8 +34,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
+
+import zhou.tools.fileselector.FileSelector;
+import zhou.tools.fileselector.FileSelectorActivity;
+import zhou.tools.fileselector.FileSelectorAlertDialog;
+import zhou.tools.fileselector.FileSelectorDialog;
+import zhou.tools.fileselector.config.FileConfig;
+import zhou.tools.fileselector.config.FileTheme;
+import zhou.tools.fileselector.utils.FileFilter;
 
 /**
  * Created by aeo on 2016/6/30.
@@ -38,7 +52,11 @@ import java.util.Scanner;
 public class ReadActivity extends  AppCompatActivity{
     // Debugging
     private static final String TAG = "READActivity";
-    private static final boolean D = true;  EditText EDT_time;
+    private static final boolean D = true;
+
+    private FileConfig fileConfig;
+
+    EditText EDT_time;
     EditText EDT_path;
     static String PATH;                                //完整路径
     String FILENAME = "SaveData";         //文件名
@@ -59,7 +77,7 @@ public class ReadActivity extends  AppCompatActivity{
             day = df.format(dayOfMonth);
             EDT_time.setText(new StringBuilder().append("").append(myear).append("-").append(month).append("-").append(day).append(""));
             FILENAME = EDT_time.getText().toString();
-            PATH = getSDPath() + File.separator + DIR + File.separator + FILENAME + FILEEND;
+            PATH =  DIR + File.separator + FILENAME + FILEEND;
             EDT_path.setText(PATH);
         }
     };
@@ -73,9 +91,12 @@ public class ReadActivity extends  AppCompatActivity{
         setContentView(R.layout.activity_read);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        fileConfig = new FileConfig();
 
         EDT_path = (EditText) findViewById(R.id.input_path);
         EDT_time = (EditText) findViewById(R.id.input_time);
+
+        DIR=getSDPath() + File.separator +DIR;
         EDT_time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,6 +132,7 @@ public class ReadActivity extends  AppCompatActivity{
 
 
         Button Bt_read = (Button) findViewById(R.id.bt_read);
+        Button Bt_choose = (Button) findViewById(R.id.bt_choose);
         Bt_read.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,7 +142,28 @@ public class ReadActivity extends  AppCompatActivity{
                 sendMessage(senddata);
             }
         });
-
+        Bt_choose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FileSelectorDialog fileDialog = new FileSelectorDialog();
+                fileDialog.setOnSelectFinish(new FileSelectorDialog.OnSelectFinish() {
+                    @Override
+                    public void onSelectFinish(ArrayList<String> paths) {
+                        DIR=paths.get(0).toString();
+                        PATH =  DIR + File.separator + FILENAME + FILEEND;
+                        EDT_path.setText(PATH);
+                        Toast.makeText(getApplicationContext(), paths.get(0).toString(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                Bundle bundle = new Bundle();
+                fileConfig.multiModel=true;
+                bundle.putSerializable(FileConfig.FILE_CONFIG, fileConfig);
+                fileDialog.setArguments(bundle);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                fileDialog.show(ft, "fileDialog");
+            }
+        });
 
     }
 
@@ -198,6 +241,9 @@ public class ReadActivity extends  AppCompatActivity{
         }
         return false;
     }
+
+
+
 
     public String getSDPath() {
         File sdDir = null;

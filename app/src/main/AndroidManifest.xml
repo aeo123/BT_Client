@@ -41,6 +41,7 @@
         <activity android:name=".ReadActivity"
             android:label="@string/str_app_read"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name="zhou.tools.fileselector.FileSelectorActivity"/>
     </application>
 
 </manifest>
